@@ -22,7 +22,7 @@ from datetime import datetime
 #+++++++++++++++++++A Function for getting stuff from the Fastems Thingworx mobile api
 def get_fastems_api_data(apiEndpoint):
     baseurl = 'https://fastems-sandbox.cloud.thingworx.com/Thingworx/Things/MobileApi_v2/services/'
-    appKey = '623064f6-a306-4cc5-87e6-2c6689dc9e9c'
+    appKey = 'API key here'
     headers = {'appKey': appKey,'Accept': 'application/json'}
     payload = {}
     try: 
