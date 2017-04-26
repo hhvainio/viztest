@@ -1,0 +1,25 @@
+{
+  "name": "node_chess",
+  "version": "1.0.0",
+  "description": "",
+  "main": "App_Nodejs.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "object-assign": "^4.1.0",
+    "socket.io": "^1.5.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WillWelker/node_chess.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WillWelker/node_chess/issues"
+  },
+  "homepage": "https://github.com/WillWelker/node_chess#readme"
+}
