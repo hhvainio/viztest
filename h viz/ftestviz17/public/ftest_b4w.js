@@ -39,7 +39,9 @@ var m_cfg     = require("config");
 var m_quat = require("quat");
 
 var _enable_camera_controls = true;
-var socket = io();
+var _socket = io();
+
+//var net = require('net');
 
 //set the fastems subsystem names for the color changer function
 var fms = "FMS";
@@ -48,13 +50,14 @@ var ls2 = "LS2";
 var mc1 ="MC1";
 var mc2 = "MC2";
 //and for testing purposes, mock statuscolors (which would come from python in reality!): 
-var statusred = "red";
-var statusblue = "blue";
-var statusgreen = "green";
-var statusyellow = "yellow";
+var statusred = "Red";
+var statusblue = "Blue";
+var statusgreen = "Green";
+var statusyellow = "Yellow";
 
 var pythondata; //for testing
 var pythondata2; //for testing different stuff simultaneously
+var pydata2;
 
 exports.init = function() { //creates the main canvas container in the website
     m_app.init({
@@ -80,29 +83,41 @@ function init_cb(canvas_elem, success) {
 //THIS IS FOR GETTING DATA FROM THE NODE.JS SERVER! Not sure if it works.
 //It currently works only on refreshing the website, as it is under the init_network function
 //Replace with any other method of getting the job done.  
-
+var whatthehell;
 function init_netwok(){ 
     console.log("init_network");
 	
-	socket = io.connect();
+	_socket = io.connect();
 
-      socket.on('connect', function () {
+      _socket.on('connection', function () {
 		});
-	
-    socket.emit('pydata'); //ask the server for data
-	socket.on('pydata', function (pydata) {
-		change_subsystem_color(mc2, pydata);
-		pythondata = pydata;
-    });
+
+	//_socket.emit('pydata'); //ask the server for data
 		
+	_socket.on('pydata', function(pydata) {
+			//String py64 = DatatypeConverter.printBase64Binary(originalBytes);
+			//String py64 = 'Blue';
+		pydata2 = pydata.toString();
+		console.log('Received pydata after toString' + pydata + typeof pydata);
+	
+		//console.log(String(pydata2).equals("Yellow"))
+		if(pydata.indexOf("Yellow") >= 0){console.log("test-if-clause thinks ok")}
+		else{console.log("test-if-clause thinks not ok")}
+		
+		change_subsystem_color(mc2, pydata2);
+		console.log('Trying to change the color to ' + pydata2);
+			//pythondata = pydata;
+	}); 
+
 	//THIS MIGHT BE THE PROBLEM:
     //String pydata2 = new String(pydata, bytes); 
 	//Couldn't get that to work. But if you can send strings from your database, it doesn't need to work.
 	
 	//loop the SOME() function indefinitely... not working right now?
-  m_time.set_timeout(function(){init_network()}, 1/15);
+  //m_time.set_timeout(function(){init_network()}, 1/15);
 	
 }
+
 
 //THIS LOADS THE BLENDER 3D-MODEL, WHICH IS PORTED FROM BLENDER AS JSON
 function load() {
@@ -113,7 +128,7 @@ function load() {
 function load_cb(data_id) {
     m_app.enable_camera_controls();
 	init_netwok();
-	
+
 }
 
 
@@ -133,15 +148,16 @@ function change_subsystem_color(subsystem,statuscolor) {
 	
 	var subsys = m_scenes.get_object_by_name(subsystem); //get the object names from the 3d-model
 	var materialName=m_mat.get_materials_names(subsys); //get the object material names
-	
+	console.log("If clause sees color " + statuscolor)
 	//define the colors NOTICE THE CAPITAL LETTERS IN THE COLOR NAMES!!!
-	if(statuscolor=="Red"){var col1=200;var col2=0;var col3=0;}
-	else if(statuscolor=="Green"){var col1=0;var col2=200;var col3=0;}
-	else if(statuscolor=="Blue"){var col1=0;var col2=0;var col3=200;}
-	else if(statuscolor=="Yellow"){var col1=200;var col2=200;var col3=0;}
-	else {var col1=0;var col2=0;var col3=0;}
+	if(statuscolor.indexOf("Red") >= 0){var col1=200;var col2=0;var col3=0;}
+	else if(statuscolor.indexOf("Green") >= 0){var col1=0;var col2=200;var col3=0;}
+	else if(statuscolor.indexOf("Blue") >= 0){var col1=0;var col2=0;var col3=200;}
+	else if(statuscolor.indexOf("Yellow") >= 0){var col1=200;var col2=200;var col3=0; console.log("Status was yellow yeah!");}
+	else {var col1=0;var col2=0;var col3=0; console.log("I see a mc2 I want to paint it black...");}
 	
 	m_mat.set_diffuse_color(subsys, materialName[0], [col1,col2,col3]); //set the color for the material in question
+	console.log("Tried change_subsystem_color function with " + statuscolor + typeof statuscolor)
 }
 
 });
