@@ -25,8 +25,8 @@ app.use(express.static('public'));
 
 
 
-var pydata //THIS IS FOR THE DATA LOADED FROM PYTHON
-
+var pydata = JSON.stringify({"CC": {"StatusColor" : "Green"}, "SC": {"StatusColor" : "Green"}, "LS 1" : {"StatusColor" : "Green"}, "LS 2": {"StatusColor" : "Green"}, "MC 1": {"StatusColor" : "Green"}, "MC 2": {"StatusColor" : "Green"}}); //THIS IS FOR THE DATA LOADED FROM PYTHON
+var pydata2 = JSON.stringify({"SC": "Green", "LS 1" : "Green", "LS 2": "Green", "MC 1": "Green", "MC 2": "Green"});
 //CREATE A SOCKET SERVER THAT IS LISTENING TO THE PYTHON MODEL
 net.createServer(function(sock) {
     
@@ -36,11 +36,19 @@ net.createServer(function(sock) {
     // Add a 'data' event handler to this instance of socket
     sock.on('data', function(data) {
         
-        console.log('DATA ' + sock.remoteAddress + ': ' + data);
+        //console.log('DATA ' + sock.remoteAddress + ': ' + data);
         pydata = data; //THIS IS THE DATA WE GET FROM PYTHON
     });
-    console.log('pydata' + pydata);
+    console.log('pydata' + pydata + typeof pydata);
 
+	//pydata2  = JSON.stringify(pydata);
+	//pydata2 = pydata.toString();
+	pydata2 = JSON.parse(pydata);
+	//console.log('attempting to access pydata2 dict: ' + pydata2["Device_statuses"]["MC 1"])
+	console.log('after JSON parse' + pydata2 + typeof pydata2);
+	
+	io.emit('pydata', pydata2);
+	console.log("Sent pydata straight to b4w! ");
 	
 }).listen(1337, '127.0.0.1.');
 
@@ -56,11 +64,16 @@ io.sockets.on('connection', function (socket) { //This refers to the first serve
 	  	console.log('Viz disconnect');
 	});
 	
-	socket.on('pydata', function () { //THis socket is listening to visualization color change function
+	/* socket.on('pydata', function () { //This socket is listening to visualization color change function
 		console.log('Im trying to send ' + pydata);
-		io.emit('pydata', pydata); //This is where we send the data from Python over the socket to the visualizer
+		io.emit('pydata', pydata2); //This is where we send the data from Python over the socket to the visualizer
 		console.log("Sent pydata to b4w! " + pydata);
-	});
+	}); */
+	
+	/* setTimeout(function() {
+		io.emit('pydata', pydata2);
+		console.log("Sent pydata straight to b4w! " + pydata);
+	}, 5000 ); */
 	
 		
 });
